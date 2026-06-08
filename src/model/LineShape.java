@@ -3,10 +3,6 @@ package model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-/**
- * Forme ligne.
- * Pour une ligne, width et height representent le delta (endX - startX, endY - startY).
- */
 public class LineShape extends Shape {
 
     public LineShape(double startX, double startY, double endX, double endY, Color color) {
@@ -22,7 +18,6 @@ public class LineShape extends Shape {
 
     @Override
     public void fillShape(GraphicsContext gc) {
-        // Une ligne n'a pas de remplissage
     }
 
     @Override
@@ -41,7 +36,6 @@ public class LineShape extends Shape {
         double endY = y + height;
         double length = Math.sqrt(Math.pow(endX - x, 2) + Math.pow(endY - y, 2));
         double dist = Math.abs((endY - y) * px - (endX - x) * py + endX * y - endY * x) / length;
-        // Verifier que le point est dans les limites du segment
         double minX = Math.min(x, endX) - 5;
         double maxX = Math.max(x, endX) + 5;
         double minY = Math.min(y, endY) - 5;

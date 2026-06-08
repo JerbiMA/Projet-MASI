@@ -3,14 +3,10 @@ package model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-/**
- * Forme rectangle.
- */
 public class RectangleShape extends Shape {
 
     public RectangleShape(double startX, double startY, double endX, double endY, Color color) {
-        super(Math.min(startX, endX), Math.min(startY, endY),
-              Math.abs(endX - startX), Math.abs(endY - startY), color);
+        super(Math.min(startX, endX), Math.min(startY, endY), Math.abs(endX - startX), Math.abs(endY - startY), color);
     }
 
     @Override

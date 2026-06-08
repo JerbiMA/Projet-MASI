@@ -3,9 +3,6 @@ package command;
 import model.Drawing;
 import model.Shape;
 
-/**
- * Commande pour ajouter une forme au dessin.
- */
 public class DrawCommand implements Command {
 
     private final Drawing drawing;

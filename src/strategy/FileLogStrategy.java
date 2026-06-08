@@ -6,13 +6,9 @@ import java.io.PrintWriter;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Strategie de journalisation dans un fichier texte.
- */
 public class FileLogStrategy implements LogStrategy {
 
-    private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final String filename;
 
@@ -22,8 +18,7 @@ public class FileLogStrategy implements LogStrategy {
 
     @Override
     public void log(String message) {
-        try (FileWriter fw = new FileWriter(filename, true);
-             PrintWriter pw = new PrintWriter(fw)) {
+        try (FileWriter fw = new FileWriter(filename, true); PrintWriter pw = new PrintWriter(fw)) {
             String timestamp = LocalDateTime.now().format(FORMATTER);
             pw.println("[" + timestamp + "] " + message);
         } catch (IOException e) {

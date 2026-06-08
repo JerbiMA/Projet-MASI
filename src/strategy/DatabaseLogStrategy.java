@@ -4,13 +4,9 @@ import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Strategie de journalisation dans une base de donnees SQLite.
- */
 public class DatabaseLogStrategy implements LogStrategy {
 
-    private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final Connection connection;
 
@@ -21,10 +17,7 @@ public class DatabaseLogStrategy implements LogStrategy {
 
     private void initTable() {
         try (Statement stmt = connection.createStatement()) {
-            stmt.execute("CREATE TABLE IF NOT EXISTS logs ("
-                + "id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                + "timestamp TEXT, "
-                + "message TEXT)");
+            stmt.execute("CREATE TABLE IF NOT EXISTS logs (" + "id INTEGER PRIMARY KEY AUTOINCREMENT, " + "timestamp TEXT, " + "message TEXT)");
         } catch (SQLException e) {
             System.err.println("Erreur initialisation table logs: " + e.getMessage());
         }

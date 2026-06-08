@@ -1,4 +1,3 @@
-
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -28,47 +27,35 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
-/**
- * Application principale JavaFX - Dessin de formes geometriques. Utilise les
- * design patterns: Factory, Command, Memento, Observer, Strategy, Singleton,
- * Decorator, Adapter.
- */
 public class App extends Application {
 
-    // Composants principaux
     private Drawing drawing;
     private CommandHistory commandHistory;
     private ActionSubject actionSubject;
     private ShapeFactory shapeFactory;
     private SqliteStorageAdapter storageAdapter;
 
-    // Composants UI
     private Canvas canvas;
     private TextArea logArea;
 
-    // etat de l'outil de dessin
     private String selectedShapeType = "rectangle";
     private Color selectedColor = Color.BLACK;
     private boolean fillEnabled = false;
     private boolean dashedEnabled = false;
     private double startX, startY;
 
-    private static final DateTimeFormatter TIME_FORMAT
-            = DateTimeFormatter.ofPattern("HH:mm:ss");
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HH:mm:ss");
 
     @Override
     public void start(Stage stage) {
-        // Initialiser les composants
         drawing = new Drawing();
         commandHistory = new CommandHistory();
         actionSubject = new ActionSubject();
         shapeFactory = new ShapeFactory();
         storageAdapter = new SqliteStorageAdapter("drawings.db");
 
-        // Observer: enregistrer le Logger (Singleton) comme observateur
         actionSubject.addObserver(Logger.getInstance());
 
-        // Construire l'interface
         BorderPane root = new BorderPane();
         root.setTop(createToolbar());
         root.setLeft(createPalette());
@@ -76,7 +63,6 @@ public class App extends Application {
         root.setBottom(createLogArea());
         root.setStyle("-fx-background-color: #f5f5f5;");
 
-        // Observer: enregistrer l'affichage dans le panneau de log
         actionSubject.addObserver(action -> {
             String timestamp = LocalDateTime.now().format(TIME_FORMAT);
             logArea.appendText("[" + timestamp + "] " + action + "\n");
@@ -90,24 +76,14 @@ public class App extends Application {
         actionSubject.notifyObservers("Application demarree");
     }
 
-    /**
-     * Creer la barre d'outils (Annuler, Enregistrer, Ouvrir, Effacer, Strategie
-     * de log).
-     */
     private ToolBar createToolbar() {
-        // Bouton Annuler (Command + Undo)
         Button undoBtn = new Button("\u21A9 Annuler");
-        undoBtn.setOnAction(e
-                -> Optional.of(commandHistory)
-                        .filter(CommandHistory::canUndo)
-                        .ifPresent(ch -> {
-                            Command cmd = ch.undo();
-                            actionSubject.notifyObservers("Annulation: " + cmd.getDescription());
-                            redrawCanvas();
-                        })
-        );
+        undoBtn.setOnAction(e -> Optional.of(commandHistory).filter(CommandHistory::canUndo).ifPresent(ch -> {
+            Command cmd = ch.undo();
+            actionSubject.notifyObservers("Annulation: " + cmd.getDescription());
+            redrawCanvas();
+        }));
 
-        // Bouton Effacer
         Button clearBtn = new Button("\uD83D\uDDD1 Effacer tout");
         clearBtn.setOnAction(e -> {
             drawing.clear();
@@ -116,7 +92,6 @@ public class App extends Application {
             actionSubject.notifyObservers("Dessin efface");
         });
 
-        // Bouton Enregistrer (Memento + Adapter)
         Button saveBtn = new Button("\uD83D\uDCBE Enregistrer");
         saveBtn.setOnAction(e -> {
             TextInputDialog dialog = new TextInputDialog("mon_dessin");
@@ -129,7 +104,6 @@ public class App extends Application {
             });
         });
 
-        // Bouton Ouvrir (Memento + Adapter)
         Button openBtn = new Button("\uD83D\uDCC2 Ouvrir");
         openBtn.setOnAction(e -> {
             List<String> drawings = storageAdapter.listDrawings();
@@ -146,13 +120,11 @@ public class App extends Application {
             });
         });
 
-        // Selecteur de strategie de log (Strategy)
         Label logLabel = new Label("Journal:");
         ComboBox<String> logStrategyBox = new ComboBox<>();
         logStrategyBox.getItems().addAll("Console", "Fichier", "Base de donnees");
         logStrategyBox.setValue("Console");
 
-        // Map de strategies - pas de if/else
         Map<String, Supplier<LogStrategy>> strategies = Map.of(
                 "Console", ConsoleLogStrategy::new,
                 "Fichier", () -> new FileLogStrategy("log.txt"),
@@ -173,9 +145,6 @@ public class App extends Application {
         return toolbar;
     }
 
-    /**
-     * Creer la palette laterale (formes, couleurs, styles).
-     */
     private VBox createPalette() {
         VBox palette = new VBox(10);
         palette.setPadding(new Insets(15));
@@ -184,7 +153,6 @@ public class App extends Application {
                 + "-fx-border-width: 0 1 0 0;");
         palette.setPrefWidth(170);
 
-        // Section: Formes
         Label shapesLabel = new Label("Formes");
         shapesLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14;");
 
@@ -206,22 +174,18 @@ public class App extends Application {
         lineBtn.setMaxWidth(Double.MAX_VALUE);
         lineBtn.setUserData("line");
 
-        // Observer sur la selection de forme (pas de if/else grâce a Optional)
-        shapeGroup.selectedToggleProperty().addListener((obs, oldVal, newVal)
-                -> Optional.ofNullable(newVal).ifPresent(toggle -> {
-                    selectedShapeType = (String) toggle.getUserData();
-                    actionSubject.notifyObservers("Forme selectionnee: " + selectedShapeType);
-                })
-        );
+        shapeGroup.selectedToggleProperty().addListener((obs, oldVal, newVal) -> Optional.ofNullable(newVal).ifPresent(toggle -> {
+            selectedShapeType = (String) toggle.getUserData();
+            actionSubject.notifyObservers("Forme selectionnee: " + selectedShapeType);
+        }));
 
-        // Section: Couleurs
         Label colorsLabel = new Label("Couleur");
         colorsLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14;");
 
         Color[] colors = {
-            Color.BLACK, Color.RED, Color.BLUE,
-            Color.GREEN, Color.ORANGE, Color.PURPLE,
-            Color.BROWN, Color.DEEPPINK, Color.TEAL
+                Color.BLACK, Color.RED, Color.BLUE,
+                Color.GREEN, Color.ORANGE, Color.PURPLE,
+                Color.BROWN, Color.DEEPPINK, Color.TEAL
         };
 
         FlowPane colorPane = new FlowPane(5, 5);
@@ -239,7 +203,6 @@ public class App extends Application {
             colorPane.getChildren().add(colorBtn);
         }
 
-        // Section: Style (Decorator)
         Label styleLabel = new Label("Style");
         styleLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14;");
 
@@ -257,7 +220,6 @@ public class App extends Application {
             actionSubject.notifyObservers("Bordure tiretee: " + stateLabels.get(newVal));
         });
 
-        // Info suppression
         Label infoLabel = new Label("Clic droit pour\nsupprimer une forme");
         infoLabel.setStyle("-fx-font-size: 10; -fx-text-fill: #888;");
 
@@ -274,16 +236,11 @@ public class App extends Application {
         return palette;
     }
 
-    /**
-     * Creer le panneau central avec le canvas de dessin.
-     */
     private StackPane createCanvasPane() {
         canvas = new Canvas(800, 560);
 
-        // Dessiner le fond blanc initial
         redrawCanvas();
 
-        // Maps pour appliquer les decorateurs sans if/else
         Map<Boolean, Function<Shape, Shape>> fillDecorators = Map.of(
                 true, s -> new ColoredShapeDecorator(s, selectedColor),
                 false, Function.identity()
@@ -293,55 +250,41 @@ public class App extends Application {
                 false, Function.identity()
         );
 
-        // Gestion de la souris pour dessiner
         canvas.setOnMousePressed(e -> {
             startX = e.getX();
             startY = e.getY();
 
-            // Clic droit pour supprimer (Command pattern)
             Optional.of(e.getButton())
                     .filter(b -> b == MouseButton.SECONDARY)
                     .ifPresent(b -> deleteShapeAt(e.getX(), e.getY()));
         });
 
-        canvas.setOnMouseDragged(e
-                -> Optional.of(e.getButton())
-                        .filter(b -> b == MouseButton.PRIMARY)
-                        .ifPresent(b -> {
-                            redrawCanvas();
-                            GraphicsContext gc = canvas.getGraphicsContext2D();
-                            gc.save();
-                            gc.setLineDashes(5, 5);
-                            gc.setStroke(Color.GRAY);
-                            gc.setLineWidth(1);
-                            Shape preview = shapeFactory.createShape(selectedShapeType,
-                                    startX, startY, e.getX(), e.getY(), Color.GRAY);
-                            preview.draw(gc);
-                            gc.restore();
-                        })
-        );
+        canvas.setOnMouseDragged(e -> Optional.of(e.getButton()).filter(b -> b == MouseButton.PRIMARY).ifPresent(b -> {
+            redrawCanvas();
+            GraphicsContext gc = canvas.getGraphicsContext2D();
+            gc.save();
+            gc.setLineDashes(5, 5);
+            gc.setStroke(Color.GRAY);
+            gc.setLineWidth(1);
+            Shape preview = shapeFactory.createShape(selectedShapeType,
+                    startX, startY, e.getX(), e.getY(), Color.GRAY);
+            preview.draw(gc);
+            gc.restore();
+        }));
 
-        canvas.setOnMouseReleased(e
-                -> Optional.of(e.getButton())
-                        .filter(b -> b == MouseButton.PRIMARY)
-                        .ifPresent(b -> {
-                            // Factory: creer la forme
-                            Shape shape = shapeFactory.createShape(selectedShapeType,
-                                    startX, startY, e.getX(), e.getY(), selectedColor);
+        canvas.setOnMouseReleased(e -> Optional.of(e.getButton()).filter(b -> b == MouseButton.PRIMARY).ifPresent(b -> {
+            Shape shape = shapeFactory.createShape(selectedShapeType,
+                    startX, startY, e.getX(), e.getY(), selectedColor);
 
-                            // Decorator: appliquer les decorateurs via Map lookup
-                            shape = fillDecorators.get(fillEnabled).apply(shape);
-                            shape = dashDecorators.get(dashedEnabled).apply(shape);
+            shape = fillDecorators.get(fillEnabled).apply(shape);
+            shape = dashDecorators.get(dashedEnabled).apply(shape);
 
-                            // Command: executer et ajouter a l'historique
-                            DrawCommand cmd = new DrawCommand(drawing, shape);
-                            commandHistory.executeCommand(cmd);
+            DrawCommand cmd = new DrawCommand(drawing, shape);
+            commandHistory.executeCommand(cmd);
 
-                            // Observer: notifier
-                            actionSubject.notifyObservers(cmd.getDescription());
-                            redrawCanvas();
-                        })
-        );
+            actionSubject.notifyObservers(cmd.getDescription());
+            redrawCanvas();
+        }));
 
         StackPane canvasPane = new StackPane(canvas);
         canvasPane.setStyle("-fx-background-color: #e0e0e0;");
@@ -349,9 +292,6 @@ public class App extends Application {
         return canvasPane;
     }
 
-    /**
-     * Creer le panneau de log en bas.
-     */
     private VBox createLogArea() {
         logArea = new TextArea();
         logArea.setEditable(false);
@@ -369,14 +309,10 @@ public class App extends Application {
         return logBox;
     }
 
-    /**
-     * Supprimer la forme la plus haute au point (px, py). Utilise des streams
-     * au lieu de if/else.
-     */
     private void deleteShapeAt(double px, double py) {
         drawing.getShapes().stream()
                 .filter(shape -> shape.contains(px, py))
-                .reduce((a, b) -> b) // Prendre la derniere (la plus haute)
+                .reduce((a, b) -> b)
                 .ifPresent(shape -> {
                     DeleteCommand cmd = new DeleteCommand(drawing, shape);
                     commandHistory.executeCommand(cmd);
@@ -385,15 +321,11 @@ public class App extends Application {
                 });
     }
 
-    /**
-     * Redessiner entierement le canvas.
-     */
     private void redrawCanvas() {
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(Color.WHITE);
         gc.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
 
-        // Grille de fond subtile
         gc.setStroke(Color.rgb(235, 235, 235));
         gc.setLineWidth(0.5);
         for (double x = 0; x < canvas.getWidth(); x += 20) {
@@ -403,15 +335,11 @@ public class App extends Application {
             gc.strokeLine(0, y, canvas.getWidth(), y);
         }
 
-        // Dessiner toutes les formes
         for (Shape shape : drawing.getShapes()) {
             shape.draw(gc);
         }
     }
 
-    /**
-     * Convertir une couleur en chaine hex
-     */
     private String colorToHex(Color color) {
         return String.format("#%02X%02X%02X",
                 (int) (color.getRed() * 255),

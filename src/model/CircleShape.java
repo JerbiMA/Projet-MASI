@@ -3,14 +3,10 @@ package model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-/**
- * Forme cercle (ellipse).
- */
 public class CircleShape extends Shape {
 
     public CircleShape(double startX, double startY, double endX, double endY, Color color) {
-        super(Math.min(startX, endX), Math.min(startY, endY),
-              Math.abs(endX - startX), Math.abs(endY - startY), color);
+        super(Math.min(startX, endX), Math.min(startY, endY), Math.abs(endX - startX), Math.abs(endY - startY), color);
     }
 
     @Override
@@ -41,8 +37,7 @@ public class CircleShape extends Shape {
         double cy = y + height / 2;
         double rx = width / 2;
         double ry = height / 2;
-        double normalized = Math.pow(px - cx, 2) / Math.pow(rx, 2)
-                          + Math.pow(py - cy, 2) / Math.pow(ry, 2);
+        double normalized = Math.pow(px - cx, 2) / Math.pow(rx, 2) + Math.pow(py - cy, 2) / Math.pow(ry, 2);
         return normalized <= 1;
     }
 }

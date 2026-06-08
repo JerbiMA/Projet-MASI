@@ -3,9 +3,6 @@ package decorator;
 import javafx.scene.canvas.GraphicsContext;
 import model.Shape;
 
-/**
- * Decorateur qui ajoute une bordure en tirets a une forme.
- */
 public class DashedBorderDecorator extends ShapeDecorator {
 
     public DashedBorderDecorator(Shape shape) {

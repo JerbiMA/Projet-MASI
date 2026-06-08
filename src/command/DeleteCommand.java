@@ -3,9 +3,6 @@ package command;
 import model.Drawing;
 import model.Shape;
 
-/**
- * Commande pour supprimer une forme du dessin.
- */
 public class DeleteCommand implements Command {
 
     private final Drawing drawing;

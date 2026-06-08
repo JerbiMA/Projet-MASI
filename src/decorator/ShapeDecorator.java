@@ -4,10 +4,6 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 import model.Shape;
 
-/**
- * Design Pattern Decorator - Classe abstraite.
- * Enveloppe une forme pour lui ajouter des fonctionnalites visuelles.
- */
 public abstract class ShapeDecorator extends Shape {
 
     protected Shape decoratedShape;
@@ -37,7 +33,6 @@ public abstract class ShapeDecorator extends Shape {
         return decoratedShape.contains(px, py);
     }
 
-    // Deleguer les getters a la forme decoree
     @Override
     public double getX() { return decoratedShape.getX(); }
 
